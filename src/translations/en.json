@@ -1,0 +1,20 @@
+
+
+
+{
+    "password" :"Password",
+    "email":"Email",
+    "login":"Log in ",
+    "signin":"Sign In",
+    "password forgotten" :"Password forgotten",
+    "activities" : "Activites",
+    "logout" : "Log out",
+    "scan":"Scanner",
+    "home": "Home",
+    "constumers":"Constumers",
+    "account" :"account",
+    "verification":"Verification"
+
+}
+
+
