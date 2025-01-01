@@ -3,6 +3,7 @@ from pydantic import EmailStr
 from asyncpg import Connection
 from app.db.session import connect_to_db , close_db_connection
 from app.services.auth_service import  login_user
+from app.services.user_service import generate_barcode , get_user_by_email
 from app.db.schemas.auth import UserLogin;
 import asyncpg
 
@@ -33,4 +34,7 @@ async def login_endpoint(user: UserLogin, db: asyncpg.Connection = Depends(get_d
             detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {"access_token": token, "token_type": "bearer"}
+    user =  await get_user_by_email(db, email)
+    reference_number, barcode_base64  = await generate_barcode(user['last_name'] , user['first_name'] , user['date_birth'] , user['id'])
+   
+    return {"access_token": token, "token_type": "bearer" , "reference_number": reference_number, "barcode_base64" : barcode_base64 }

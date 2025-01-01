@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.endpoints import register, auth , password , activateEmail
+from app.api.endpoints import register, auth , password , activateEmail , gestionUsers
 import uvicorn
 from app.db.session import connect_to_db, close_db_connection
 
@@ -9,6 +9,7 @@ app.include_router(register.router, tags=["Register"])
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(activateEmail.router , tags=['ActivateEmail'])
 app.include_router(password.router, tags=["Password"])
+app.include_router(gestionUsers.router , tags=["GestionUsers"])
 
 @app.on_event("startup")
 async def startup():
