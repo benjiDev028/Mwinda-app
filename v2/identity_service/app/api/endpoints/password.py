@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.services.user_service import update_user_password , get_user_by_email, reset_password_request
+from app.services.user_service import update_user_password , get_userv1_by_email, reset_password_request
 from app.services.user_code_service import send_reset_code_to_user , verify_code
 from app.db.schemas.password import PasswordUpdate , ResetPasswordRequest , CodeResetPasswordRequest , UpdatePasswordRequest
 from app.db.session import connect_to_db , close_db_connection
@@ -28,7 +28,7 @@ async def update_password_endpoint(
     """
     Endpoint pour mettre à jour  le mot de passe.
     """
-    db_user = await get_user_by_email(db, email=user.email)
+    db_user = await get_userv1_by_email(db, email=user.email)
     #verifie s'il l'email existe
     if not db_user or not verify_password(user.old_password, db_user["password_hash"], db_user["password_salt"]):
         raise HTTPException(status_code=400, detail="Invalid credentials")

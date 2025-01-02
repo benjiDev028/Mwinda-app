@@ -5,7 +5,7 @@ import base64
 from typing import List
 from PIL import Image
 from io import BytesIO
-from barcode import Code128
+from barcode.codex  import Code128
 import aio_pika
 import random
 from fastapi import HTTPException
@@ -73,6 +73,10 @@ async def get_user(db: asyncpg.Connection, user_id: uuid):
     query = "SELECT id, first_name, last_name, email, date_birth, is_email_verified, points FROM users WHERE id = $1"
     return await db.fetchrow(query, user_id)
 
+
+async def get_userv1_by_email(db: asyncpg.Connection, email: str):
+    query = "SELECT * FROM users WHERE email = $1"
+    return await db.fetchrow(query, email)
 
 
 async def get_user_by_email(db: asyncpg.Connection, email: str):
