@@ -17,10 +17,12 @@ COPY . .
 COPY requirements.txt /app/
 
 RUN pwd
-RUN dir 
+RUN ls -la
+RUN ping -c 4 google.com
+
 
 # Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt || tail -n 100 /var/log/apt/term.log
 
 # Exposer le port de l'application
 EXPOSE 8000

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Boolean, Integer, DateTime, ForeignKey,Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -12,7 +12,11 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     password_salt = Column(String, nullable=False)
-    date_birth = Column(DateTime, nullable=True)
+    date_birth = Column(String, nullable=True)
     is_email_verified = Column(Boolean, default=False)
+    role = Column(String, default="client")
     points = Column(Integer, default=0)
+    created_at = Column(DateTime, default=DateTime.datetime.utcnow)
+    updated_at = Column(DateTime, default=DateTime.datetime.utcnow)
+
 

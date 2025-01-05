@@ -33,11 +33,11 @@ async def register_user(db: asyncpg.Connection, user: UserCreate) ->UserResponse
     # Hachage du mot de passe
     hashed_password, salt_password = get_password_hash(user.password)
 
-    # Insertion dans la base de données
+   # Insertion dans la base de données
     query = """
     INSERT INTO users (id, first_name, last_name, email, password_hash, password_salt, date_birth, is_email_verified, points)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING id, first_name, last_name, email,date_birth, is_email_verified, points
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 )
+    RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
     """
     new_user = await db.fetchrow(
         query,
@@ -49,7 +49,8 @@ async def register_user(db: asyncpg.Connection, user: UserCreate) ->UserResponse
         salt_password,
         user.date_birth,
         False,
-        0,
+        0
+     
     )
 
     if not new_user:
@@ -70,7 +71,7 @@ async def activate_user_email(db: asyncpg.Connection, email: str):
         raise RuntimeError(f"Erreur lors de la mise à jour du mot de passe : {e}")
 
 async def get_user(db: asyncpg.Connection, user_id: uuid):
-    query = "SELECT id, first_name, last_name, email, date_birth, is_email_verified, points FROM users WHERE id = $1"
+    query = "SELECT id, first_name, last_name, email, date_birth,role, is_email_verified, points FROM users WHERE id = $1"
     return await db.fetchrow(query, user_id)
 
 

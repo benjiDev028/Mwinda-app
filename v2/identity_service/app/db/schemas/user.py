@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from datetime import datetime,date
 from uuid import UUID
 #Schemas pour Verfication Email
 class NotificationRequest(BaseModel):
@@ -14,7 +14,7 @@ class UserBase(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
-    date_birth: datetime
+    date_birth: str
 
 class UserFindByName(BaseModel):
     first_name: str
@@ -24,20 +24,21 @@ class UserFindByEmail(BaseModel):
     email: str
 
 class UserFindByBirth(BaseModel):
-    date_birth: datetime
+    date_birth: str
 
 class User(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
-    date_birth: datetime
+    date_birth: str
 
 class UserResponseFind(UserBase):
     id: UUID
     first_name: str
     last_name: str
     email: EmailStr
-    date_birth: datetime
+    date_birth: str
+    role: str
     is_email_verified: bool 
     points: int 
 
@@ -48,8 +49,14 @@ class UserFindById(BaseModel):
 
 class UserResponse(UserBase):
     id: UUID
+    first_name: str
+    last_name: str
+    email: str
+    date_birth: str
+    role : str= "client"
     is_email_verified: bool = False
     points: int = 0
+
 
 
 class User(UserBase):
