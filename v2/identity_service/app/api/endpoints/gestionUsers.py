@@ -33,19 +33,25 @@ async def get_all_users(db: asyncpg.Connection = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/get_users_by_name")
-async def get_users_by_name(username : UserFindByName,db: asyncpg.Connection = Depends(get_db)):
+# Route pour récupérer les utilisateurs par nom
+@router.get("/get_users_by_name/{username}")
+async def get_users_by_name(username: str, db: asyncpg.Connection = Depends(get_db)):
     """
-    Recuperer  utilisateurs par nom d'utilisateur.
+    Récupérer les utilisateurs par prénom et/ou nom d'utilisateur.
     """
     try:
-         
-        users = await get_by_username(db , username.first_name , username.last_name)
+        # Recherche des utilisateurs par prénom et nom
+        users = await get_by_username(db, username)
+        
         if not users:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Users not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users found with the provided name(s).")
+        
         return jsonable_encoder(users)
+    
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred.")
 
 
 @router.get("/get_user_by_mail")

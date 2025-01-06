@@ -18,46 +18,76 @@ import os
 import barcode
 from barcode.writer import ImageWriter
 import json
+from fastapi import HTTPException
+import logging
 
 
 
-async def register_user(db: asyncpg.Connection, user: UserCreate) ->UserResponse:
+async def register_user(db: asyncpg.Connection, user: UserCreate) -> UserResponse:
     """
-    Enregistre un nouvel utilisateur dans la base de données.
+    Enregistre un nouvel utilisateur dans la base de données avec une gestion améliorée des erreurs.
     """
-    # Vérification si l'email existe déjà
-    existing_user = await db.fetchrow("SELECT id FROM users WHERE email = $1", user.email)
-    if existing_user:
-        raise ValueError("Email is already registered.")
-    
-    # Hachage du mot de passe
-    hashed_password, salt_password = get_password_hash(user.password)
+    try:
+        # Vérification si l'email existe déjà
+        existing_user = await db.fetchrow("SELECT id FROM users WHERE email = $1", user.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error": "EMAIL_ALREADY_REGISTERED",
+                    "message": "The provided email is already registered. Please use a different email."
+                }
+            )
+        
+        # Hachage du mot de passe
+        hashed_password, salt_password = get_password_hash(user.password)
 
-   # Insertion dans la base de données
-    query = """
-    INSERT INTO users (id, first_name, last_name, email, password_hash, password_salt, date_birth, is_email_verified, points)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 )
-    RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
-    """
-    new_user = await db.fetchrow(
-        query,
-        uuid.uuid4(),
-        user.first_name,
-        user.last_name,
-        user.email,
-        hashed_password,
-        salt_password,
-        user.date_birth,
-        False,
-        0
-     
-    )
+        # Insertion dans la base de données
+        query = """
+        INSERT INTO users (id, first_name, last_name, email, password_hash, password_salt, date_birth, is_email_verified, points)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
+        """
+        new_user = await db.fetchrow(
+            query,
+            uuid.uuid4(),
+            user.first_name,
+            user.last_name,
+            user.email,
+            hashed_password,
+            salt_password,
+            user.date_birth,
+            False,  # L'utilisateur n'a pas encore vérifié son email
+            0       # Points initiaux de l'utilisateur
+        )
 
-    if not new_user:
-        raise ValueError("User could not be created.")
+        # Vérification que l'insertion a réussi
+        if not new_user:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "error": "USER_CREATION_FAILED",
+                    "message": "An unexpected error occurred. The user could not be created. Please try again later."
+                }
+            )
 
-    return UserResponse(**dict(new_user))
+        # Retourner la réponse utilisateur
+        return UserResponse(**dict(new_user))
 
+    except HTTPException as http_error:
+        # Gestion des erreurs déjà identifiées
+        logging.error(f"HTTP error during user registration: {http_error.detail}")
+        raise
+    except Exception as e:
+        # Gestion des erreurs imprévues
+        logging.error(f"Unexpected error during user registration: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "INTERNAL_SERVER_ERROR",
+                "message": "An unexpected error occurred. Please contact support if the problem persists."
+            }
+        )
 
 async def activate_user_email(db: asyncpg.Connection, email: str):
     

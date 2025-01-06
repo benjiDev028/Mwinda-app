@@ -38,9 +38,9 @@ class UserResponseFind(UserBase):
     last_name: str
     email: EmailStr
     date_birth: str
-    role: str
     is_email_verified: bool 
     points: int 
+    
 
 class UserCreate(UserBase):
     password: str
