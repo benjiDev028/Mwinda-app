@@ -2,12 +2,14 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 import HomeScreen from '../HomeScreen/HomeScreen';
 
 
 
 export default function TabButton() {
     const Tab = createBottomTabNavigator(); 
+    const {t} =  useTranslation();
   return (
     
     <Tab.Navigator 
@@ -32,7 +34,7 @@ export default function TabButton() {
         name='21'
         component={HomeScreen}
         options={{
-            tabBarLabel:'Activities',
+            tabBarLabel:t('activities'),
             tabBarIcon:({color,size}) =>(
                 <MaterialCommunityIcons name="chart-line" color={color} size={size}/>
             )
@@ -43,7 +45,7 @@ export default function TabButton() {
         name='211'
         component={HomeScreen}
         options={{
-            tabBarLabel:'Scan',
+            tabBarLabel:t('Scan'),
             tabBarBadge: 3, // notif
     tabBarBadgeStyle: { backgroundColor: '#ff0000', color: '#fff' },
             tabBarIcon:({color,size}) =>(
@@ -57,7 +59,7 @@ export default function TabButton() {
         name='2'
         component={HomeScreen}
         options={{
-            tabBarLabel:'home',
+            tabBarLabel:t('home'),
             tabBarIcon:({color,size}) =>(
                 <MaterialCommunityIcons name="home" color={color} size={size}/>
             )
@@ -68,7 +70,7 @@ export default function TabButton() {
         name='Home'
         component={HomeScreen}
         options={{
-            tabBarLabel:'Customers',
+            tabBarLabel:t('customers'),
             tabBarIcon:({color,size}) =>(
                 <MaterialCommunityIcons name="account-group" color={color} size={size}/>
             )
@@ -79,7 +81,7 @@ export default function TabButton() {
         name='account'
         component={HomeScreen}
         options={{
-            tabBarLabel:'Account',
+            tabBarLabel:t('profile'),
             tabBarIcon:({color,size}) =>(
                 <MaterialCommunityIcons name="account" color={color} size={size}/>
             )

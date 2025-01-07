@@ -6,13 +6,13 @@
     "email":"Email",
     "login":"Log in ",
     "signin":"Sign In",
-    "password forgotten" :"Password forgotten",
-    "activities" : "Activites",
+    "forgot password" :"Forgot Password",
+    "activities" : "Activities",
     "logout" : "Log out",
     "scan":"Scanner",
     "home": "Home",
-    "constumers":"Constumers",
-    "account" :"account",
+    "customers":"Customers",
+    "profile" :"profile",
     "verification":"Verification"
 
 }

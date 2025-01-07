@@ -5,14 +5,14 @@
     "password" :"Mot de passe",
     "email":"Email",
     "login":"Se connecter",
-    "signin":"Creer un compte",
-    "password forgotten" :"Mot de passe oublie",
+    "signin":"S'enregistrer",
+    "forgot password" :"Mot de passe oublie",
     "activities" : "Activites",
     "logout" : "Se deconnecter",
     "scan":"Scanner",
     "home": "Accueil",
-    "constumers":"Clients",
-    "account" :"Compte",
+    "customers":"Clients",
+    "profile" :"profil",
     "verification":"Verification"
 
 }
