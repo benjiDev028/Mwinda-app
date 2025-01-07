@@ -9,4 +9,8 @@ class UserCode(Base):
     __tablename__ = "user_codes"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String, nullable=False)
-    code = Column(String, nullable=False)
+    code = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=DateTime.datetime.utcnow)
+
+
+

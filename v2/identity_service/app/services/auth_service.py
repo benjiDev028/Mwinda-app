@@ -1,4 +1,4 @@
-from app.core.security import  verify_password, create_access_token
+from app.core.security import  verify_password, create_access_token , create_refresh_token
 from app.db.schemas.user import UserCreate
 from asyncpg import Connection
 import uuid
@@ -20,4 +20,4 @@ async def login_user(db: Connection, email: str, password: str) -> str:
         "user_id": str(user["id"]),
         "role": user["role"]  # Correctement accéder au rôle de l'utilisateur
     }
-    return create_access_token(data=token_data)
+    return create_access_token(data=token_data) , create_refresh_token(data= token_data)
