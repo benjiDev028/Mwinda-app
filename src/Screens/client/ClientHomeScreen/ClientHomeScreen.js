@@ -40,22 +40,7 @@ export default function ClientHomeScreen() {
         >
             <View style={styles.content}>
                 {/* Informations utilisateur */}
-                <Text style={styles.title}>Bienvenue, votre rôle est : {userRole}</Text>
-                <Text style={styles.token}>Token : {authToken}</Text>
-                <Text style={styles.label}>Code barre :</Text>
-
-                {/* Affichage de l'image avec indicateur de chargement */}
-                {loading ? (
-                    <ActivityIndicator size="large" color="#007bff" />
-                ) : (
-                    imageUri && (
-                        <Image
-                            source={{ uri: imageUri }}
-                            style={styles.image}
-                            resizeMode="contain"
-                        />
-                    )
-                )}
+          
 
                 {/* Bouton de déconnexion */}
                 <Button

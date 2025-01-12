@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import HomeScreen from '../HomeScreen/HomeScreen';
+import SignIn from '../../Screens/SigninScreen/SigninScreen';
 
 
 
@@ -17,9 +18,7 @@ export default function TabButton() {
     screenOptions={{
         tabBarActiveTintColor:'#fff',
         tabBarInactiveTintColor: '#000',
-
-        
-        
+    
         tabBarStyle:{
             backgroundColor:'#fec107',
             color:'#fff'
@@ -88,6 +87,19 @@ export default function TabButton() {
 
         }}
         />
+
+<Tab.Screen
+        name='SignIn'
+        component={SignIn}
+        options={{
+            tabBarLabel:t('profile'),
+            tabBarIcon:({color,size}) =>(
+                <MaterialCommunityIcons name="account" color={color} size={size}/>
+            )
+
+        }}
+        />
+        
     </Tab.Navigator>
   )
 }

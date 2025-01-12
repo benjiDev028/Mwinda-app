@@ -1,13 +1,18 @@
 import './src/translations/i18n';
 import './src/Configurations/ReactotronConfig';
 import SplashScreen from './src/Screens/SplashScreenView';
+import 'react-native-gesture-handler';
 import { AuthProvider } from './src/context/AuthContext';
 import { useEffect, useState } from 'react';
 import MainNavigator from './src/navigation/MainNavigator';
 import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import SignIn from './src/Screens/SigninScreen/SigninScreen';
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   const [isShowSplash, setIsShowSplash] = useState(true);
+  const stack = createBottomTabNavigator();
 
   useEffect(() => {
     setTimeout(() => {
@@ -24,7 +29,9 @@ export default function App() {
           <SplashScreen />
         ) : (
           <MainNavigator />
+       
         )}
+      
       </NavigationContainer>
     </AuthProvider>
   );

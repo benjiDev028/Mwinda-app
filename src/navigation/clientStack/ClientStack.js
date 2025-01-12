@@ -8,8 +8,11 @@ import ClientProfileScreen from "../../Screens/client/ClientProfileScreen/Client
 import ClientCodebarScreen from "../../Screens/client/ClientCodebarScreen/ClientCodebarScreen";
 import ClientSupportScreen from "../../Screens/client/ClientSupportScreen/ClientSupportScreen";
 import ClientPointsScreen from "../../Screens/client/ClientPointsScreen/ClientPointsScreen";
+import SignIn from "../../Screens/SigninScreen/SigninScreen";
+
 
 const Tab = createBottomTabNavigator();
+
 
 export default function ClientStack() {
   const { t } = useTranslation();
@@ -75,12 +78,16 @@ export default function ClientStack() {
         name="Profile"
         component={ClientProfileScreen}
         options={{
+          headerShown: false,
           tabBarLabel: t('profile'),
+
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),
         }}
       />
+      
+     
       
 
       

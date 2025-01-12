@@ -16,24 +16,7 @@ import splash from '../../../assets/img/splash.png';
 import styles from './Styles';
 
 export default function SignIn() {
-  const [pays, setPays] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState('');
-
-  useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
-      .then(response => response.json())
-      .then(data => {
-        const countries = data.map(country => ({
-          name: country.name.common,
-        }));
-
-        // Trier les pays par ordre alphabétique
-        countries.sort((a, b) => a.name.localeCompare(b.name));
-
-        setPays(countries);
-      })
-      .catch(error => console.error('Erreur:', error));
-  }, []);
+  
 
   return (
     <KeyboardAvoidingView
