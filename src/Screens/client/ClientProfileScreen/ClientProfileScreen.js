@@ -1,68 +1,114 @@
 import React, { useState, useEffect, useContext } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  Platform,
-  Keyboard,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Alert
-} from 'react-native';
+import { View, Text, Image, Platform, Keyboard, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Alert } from 'react-native';
 import splash from '../../../../assets/splash.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './Styles';
 import { AuthContext } from '../../../context/AuthContext';
+import AuthService from '../../../Services/UserServices/AuthService'; // Assurez-vous que le service AuthService est importé pour décoder le JWT
+import UserService from '../../../Services/UserServices/UserService';
 
 export default function ClientProfileScreen() {
-  const { authToken, id, logout } = useContext(AuthContext);
+  const { authToken, userRole, id,logout, barcodeBase64 } = useContext(AuthContext);
 
+  // États pour gérer les données des champs
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [date_birth, setDate_birth] = useState('');
+  const [password, setPassword] = useState('');
+
+  // États pour gérer l'édition des champs
   const [isEditing, setIsEditing] = useState(false);
 
+  // Fonction pour activer/désactiver l'édition
   const toggleEditing = () => {
+    if(isEditing)
+    {
+      handlechange();
+    }
     setIsEditing(!isEditing);
   };
+  // const decodedToken = AuthService.decodeJWT(authToken);  // authToken est le token que vous avez stocké après l'authentification
+  // const UserId = decodedToken.user_id
+   
 
-  const getUserData = async () => {
-    if (!authToken || !id) {
-      console.log('authToken ou id est manquant');
+  //fonction mise a jour 
+  const handlechange = async () => {
+    if (!firstname || !lastname || !email || !date_birth) {
+      Alert.alert("Validation Error", "Please fill in all the fields.");
       return;
     }
-
+  
+    const data = {
+      first_name: firstname,
+      last_name: lastname,
+      email: email,
+      date_birth: date_birth,
+    };
+  
     try {
-      const response = await fetch(`http://192.168.2.13:8001/identity/get_user_by_id/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFirstname(data.first_name || '');
-        setLastname(data.last_name || '');
-        setEmail(data.email || '');
-        setDate_birth(data.date_birth || '');
-      } else {
-        console.error('Erreur lors de la récupération des données utilisateur');
+      const updateUser = await UserService.updateUser(id, data, authToken);
+      console.log(updateUser);
+  
+      if (updateUser) {
+        Alert.alert("Success", "Your profile has been updated successfully!");
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error("Error saving changes:", error);
+      Alert.alert("Error", "Failed to save changes.");
     }
   };
+  
+  
 
-  useEffect(() => {
-    getUserData();
-  }, [authToken, id]);
 
+
+ // Fonction pour récupérer les informations utilisateur depuis l'API
+ const getUserData = async () => {
+  try {
+    const response = await fetch(`http://192.168.2.13:8001/identity/get_user_by_id/${id}` , {
+      method: 'Get', // Utilisation de POST si les paramètres doivent être envoyés dans le corps de la requête
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+ // Envoi de l'ID utilisateur dans le corps de la requête
+    });
+    if (response.ok) {
+      const data = await response.json();
+      setFirstname(data.first_name);
+      setLastname(data.last_name);
+      setEmail(data.email);
+      setDate_birth(data.date_birth);
+      setPassword(''); // Ne pas pré-remplir le mot de passe pour des raisons de sécurité
+    } else {
+      console.log('Erreur lors de la récupération des données utilisateur');
+    }
+  } catch (error) {
+    console.log('Erreur:', error);
+  }
+};
+
+
+useEffect(() => {
+  if (authToken) {
+    try {
+      const decodedToken = AuthService.decodeJWT(authToken); // Assurez-vous que cette fonction est disponible dans votre AuthService
+      const userId = decodedToken.id; // Supposons que l'ID utilisateur est dans le champ 'id' du token
+      getUserData(userId);  // Passez l'ID utilisateur à la fonction de récupération des données
+    } catch (error) {
+      console.log('Erreur lors du décodage du token:', error);
+    }
+  } else {
+    console.log('authToken est null ou indéfini');
+  }
+}, [authToken]); // Re-exécute quand le authToken change
+
+  // Fonction pour sauvegarder les modifications
+  const saveChanges = () => {
+    console.log('Données sauvegardées :', { firstname, lastname, email, dob, password });
+    setIsEditing(false);  // Désactive l'édition après la sauvegarde
+  };
 
   return (
     <KeyboardAvoidingView
@@ -77,9 +123,9 @@ export default function ClientProfileScreen() {
               {/* Bouton de déconnexion à droite de l'image */}
               <TouchableOpacity onPress={logout} style={styles.logoutButton}>
                 <MaterialCommunityIcons
-                  name={'logout'}
+                  name={'power'}
                   size={44}
-                  color="red"
+                  color="black"
                 />
               </TouchableOpacity>
             </View>
@@ -150,7 +196,8 @@ export default function ClientProfileScreen() {
                 style={styles.input}
                 placeholder="Password"
                 secureTextEntry
-                
+                value={password}
+                onChangeText={setPassword}
                 editable={isEditing}
               />
               

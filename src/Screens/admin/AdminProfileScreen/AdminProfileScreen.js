@@ -5,6 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import styles from './Styles';
 import { AuthContext } from '../../../context/AuthContext';
 import AuthService from '../../../Services/UserServices/AuthService'; // Assurez-vous que le service AuthService est importé pour décoder le JWT
+import UserService from '../../../Services/UserServices/UserService';
 
 export default function ClientProfileScreen() {
   const { authToken, userRole, id,logout, barcodeBase64 } = useContext(AuthContext);
@@ -21,12 +22,47 @@ export default function ClientProfileScreen() {
 
   // Fonction pour activer/désactiver l'édition
   const toggleEditing = () => {
+    if(isEditing)
+    {
+      handlechange();
+    }
     setIsEditing(!isEditing);
   };
   // const decodedToken = AuthService.decodeJWT(authToken);  // authToken est le token que vous avez stocké après l'authentification
   // const UserId = decodedToken.user_id
    
- 
+
+  //fonction mise a jour 
+  const handlechange = async () => {
+    if (!firstname || !lastname || !email || !date_birth) {
+      Alert.alert("Validation Error", "Please fill in all the fields.");
+      return;
+    }
+  
+    const data = {
+      first_name: firstname,
+      last_name: lastname,
+      email: email,
+      date_birth: date_birth,
+    };
+  
+    try {
+      const updateUser = await UserService.updateUser(id, data, authToken);
+      console.log(updateUser);
+  
+      if (updateUser) {
+        Alert.alert("Success", "Your profile has been updated successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving changes:", error);
+      Alert.alert("Error", "Failed to save changes.");
+    }
+  };
+  
+  
+
+
+
  // Fonction pour récupérer les informations utilisateur depuis l'API
  const getUserData = async () => {
   try {

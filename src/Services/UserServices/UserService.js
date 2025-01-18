@@ -49,15 +49,14 @@ const updateUser = async (userId, updatedData, authToken) => {
     if (response.ok) {
       const data = await response.json();
       // Répondre avec un message ou les données mises à jour
-      Alert.alert("Success", "Profile updated successfully!");
+      console.log("Success", "Profile updated successfully!")
       return data;
     } else {
       const error = await response.json();
-      Alert.alert("Error", error.message || "Failed to update profile.");
+      console.log("Error", error.message || "Failed to update profile.")
     }
   } catch (error) {
     console.log('Error updating user:', error);
-    Alert.alert("Error", "An error occurred while updating your profile.");
   }
 };
 
