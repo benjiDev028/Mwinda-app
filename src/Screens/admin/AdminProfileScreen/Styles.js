@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#e4e4e4',
+        backgroundColor: '#fff',
     },
     image: {
         

@@ -1,32 +1,68 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, Image, Platform, Keyboard, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Alert
+} from 'react-native';
 import splash from '../../../../assets/splash.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './Styles';
 import { AuthContext } from '../../../context/AuthContext';
 
 export default function ClientProfileScreen() {
-  const { authToken, userRole, logout, barcodeBase64 } = useContext(AuthContext);
-  // États pour gérer les données des champs
-  const [firstname, setFirstname] = useState('John');
-  const [lastname, setLastname] = useState('Doe');
-  const [email, setEmail] = useState('johndoe@gmail.com');
-  const [dob, setDob] = useState('1990-01-01');
-  const [password, setPassword] = useState('password123');
+  const { authToken, id, logout } = useContext(AuthContext);
 
-  // États pour gérer l'édition des champs
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [email, setEmail] = useState('');
+  const [date_birth, setDate_birth] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fonction pour activer/désactiver l'édition
   const toggleEditing = () => {
     setIsEditing(!isEditing);
   };
 
-  // Fonction pour sauvegarder les modifications
-  const saveChanges = () => {
-    console.log('Données sauvegardées :', { firstname, lastname, email, dob, password });
-    setIsEditing(false);  // Désactive l'édition après la sauvegarde
+  const getUserData = async () => {
+    if (!authToken || !id) {
+      console.log('authToken ou id est manquant');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://192.168.2.13:8001/identity/get_user_by_id/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFirstname(data.first_name || '');
+        setLastname(data.last_name || '');
+        setEmail(data.email || '');
+        setDate_birth(data.date_birth || '');
+      } else {
+        console.error('Erreur lors de la récupération des données utilisateur');
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
   };
+
+  useEffect(() => {
+    getUserData();
+  }, [authToken, id]);
+
 
   return (
     <KeyboardAvoidingView
@@ -104,8 +140,8 @@ export default function ClientProfileScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Date of Birth"
-                value={dob}
-                onChangeText={setDob}
+                value={date_birth}
+                onChangeText={setDate_birth}
                 editable={isEditing}
               />
 
@@ -114,8 +150,7 @@ export default function ClientProfileScreen() {
                 style={styles.input}
                 placeholder="Password"
                 secureTextEntry
-                value={password}
-                onChangeText={setPassword}
+                
                 editable={isEditing}
               />
               

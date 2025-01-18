@@ -11,12 +11,43 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import splash from '../../../assets/img/splash.png';
+import { useNavigation } from '@react-navigation/native';
 import styles from './Styles';
-
+import UserService from '../../Services/UserServices/UserService';
 export default function SignIn() {
   
+  const[Firstname, setFirstname] = useState('')
+  const[Lastname, setLastname] = useState('')
+  const[Email, setEmail] = useState('')
+  const[Password, setPassword] = useState('')
+  const[date_birth,setDate_birth] = useState('')
+
+  const navigation = useNavigation();
+
+  const handleLogin = async () => {
+    try {
+      const response = await UserService.Register(Firstname, Lastname, Email.toLowerCase(), Password, date_birth);
+      
+      // Vérifier si la réponse est correcte
+      if (response.success) {
+        alert("Vous êtes bien inscrit");
+        navigation.navigate("Login");
+      } else {
+        // Afficher un message d'erreur plus précis
+        alert(response.error || "Une erreur est survenue, veuillez réessayer.");
+      }
+    } catch (error) {
+      // Afficher les erreurs de manière détaillée
+      console.error("Error during registration:", error.message);
+      alert("Une erreur est survenue. Veuillez vérifier votre connexion ou réessayer plus tard.");
+    }
+  };
+  
+  
+
+  
+
 
   return (
     <KeyboardAvoidingView
@@ -36,15 +67,17 @@ export default function SignIn() {
               <Text style={styles.title}>SIGN IN</Text>
 
               <Text style={styles.text}>Firstname</Text>
-              <TextInput style={styles.input} placeholder="firstname" />
+              <TextInput style={styles.input} onChangeText={setFirstname} placeholder="firstname" />
 
               <Text style={styles.text}>Lastname</Text>
-              <TextInput style={styles.input} placeholder="lastname" />
+              <TextInput style={styles.input} onChangeText={setLastname} placeholder="lastname" />
 
               <Text style={styles.text}>Email</Text>
-              <TextInput style={styles.input} placeholder="johndoe@gmail.com" />
+              <TextInput style={styles.input} onChangeText={setEmail} placeholder="johndoe@gmail.com" />
+
               <Text style={styles.text}>Date of birth</Text>
               <TextInput style={styles.input} 
+              onChangeText={setDate_birth} 
               placeholder="jj/mm/aaaa"
               textContentType="birthdate"
               keyboardType="decimal-pad"
@@ -54,12 +87,13 @@ export default function SignIn() {
               <TextInput
                 style={styles.input}
                 placeholder="password"
+                onChangeText={setPassword}
                 secureTextEntry
               />
 
             </View>
-            <TouchableOpacity style={styles.activeButton} >
-                <Text style={styles.activeText}> Create</Text>
+            <TouchableOpacity style={styles.activeButton} onPress={handleLogin}>
+                <Text style={styles.activeText} > Create</Text>
             </TouchableOpacity>
             <TouchableOpacity>
                 <Text style={styles.already}> alreday sign in  ?</Text>

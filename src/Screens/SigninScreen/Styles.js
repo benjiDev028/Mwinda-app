@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#e4e4e4',
   },
   container1: {
     alignItems: 'center',

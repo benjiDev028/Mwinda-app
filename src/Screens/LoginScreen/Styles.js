@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
        width:'100%',
-        backgroundColor:'#fff'
+        backgroundColor:'#'
     },
     
 image:{width:'100%', height:'100%' , resizeMode : 'contain', marginTop:'50'},
@@ -31,6 +31,9 @@ title: {fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' 
 input: {height: 40, borderColor: '#ccc', borderWidth: 1, marginBottom: 15, padding: 10, borderRadius: 5 },
 button: {backgroundColor: 'yellow', padding: 10, borderRadius: 5, alignItems: 'center' },
 buttonText: {fontSize: 18, fontWeight: 'bold' },
+errortext :{
+    color:'red',
+}
 })
 
 
