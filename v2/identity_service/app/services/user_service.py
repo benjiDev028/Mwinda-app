@@ -10,7 +10,7 @@ import aio_pika
 import random
 from fastapi import HTTPException
 from app.core.security import get_password_hash
-from app.db.schemas.user import UserCreate, UserResponse, UserResponseFind
+from app.db.schemas.user import UserCreate, UserResponse, UserResponseFind,UserUpdate
 from app.db.schemas.password import ResetPasswordRequest, UpdatePasswordRequest
 from asyncpg import Connection
 import uuid
@@ -80,6 +80,38 @@ async def register_user(db: asyncpg.Connection, user: UserCreate) -> UserRespons
             }
         )
 
+async def update_user(db: asyncpg.Connection, user_id: uuid, user: UserUpdate) -> UserResponse:
+    try:
+        # Requête SQL pour mettre à jour l'utilisateur
+        query = """
+        UPDATE users
+        SET first_name = $1, last_name = $2, email = $3, date_birth = $4
+        WHERE id = $5
+        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
+        """
+        
+        # Exécution de la requête
+        updated_user = await db.fetchrow(
+            query,
+            user.first_name,
+            user.last_name,
+            user.email,
+            user.date_birth,
+            user_id
+        )
+        
+        if not updated_user:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé.")
+        
+        # Retourner les données de l'utilisateur mis à jour
+        return UserResponse(**updated_user)
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logging.error(f"Erreur lors de la mise à jour de l'utilisateur avec l'ID {user_id}: {e}")
+        raise HTTPException(status_code=500, detail="Erreur serveur.")
+
 async def activate_user_email(db: asyncpg.Connection, email: str):
     try:
         query = "UPDATE users SET is_email_verified = TRUE WHERE email = $1"
@@ -95,12 +127,11 @@ async def get_user(db: asyncpg.Connection, user_id: uuid):
         query = "SELECT id, first_name, last_name, email, date_birth, role, is_email_verified, points FROM users WHERE id = $1"
         user = await db.fetchrow(query, user_id)
         if not user:
-            logging.warning("User not found with ID: %s", user_id)
+            logging.warning("Utilisateur non trouvé avec l'ID : %s", user_id)
         return user
     except Exception as e:
-        logging.error("Error fetching user by ID: %s", str(e))
-        raise RuntimeError(f"Error fetching user: {e}")
-
+        logging.error("Erreur lors de la récupération de l'utilisateur par ID : %s", str(e))
+        raise RuntimeError(f"Erreur lors de la récupération de l'utilisateur : {e}")
 async def get_userv1_by_email(db: asyncpg.Connection, email: str):
     try:
         query = "SELECT * FROM users WHERE email = $1"
@@ -150,7 +181,7 @@ async def get_users_by_birthday(db: asyncpg.Connection, date_birth: str) -> List
 async def get_users(db: asyncpg.Connection) -> List[UserResponse]:
     try:
         query = """
-        SELECT id, first_name, last_name, email, date_birth, is_email_verified, points
+        SELECT id, first_name, last_name, email, date_birth, is_email_verified,role, points
         FROM users
         """
         users = await db.fetch(query)

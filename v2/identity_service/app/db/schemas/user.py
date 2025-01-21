@@ -26,6 +26,12 @@ class UserFindByEmail(BaseModel):
 class UserFindByBirth(BaseModel):
     date_birth: str
 
+class UserUpdate(BaseModel) :
+    first_name: str
+    last_name: str
+    email :EmailStr
+    date_birth :str
+
 class User(BaseModel):
     first_name: str
     last_name: str
@@ -53,7 +59,7 @@ class UserResponse(UserBase):
     last_name: str
     email: str
     date_birth: str
-    role : str= "client"
+    role : str
     is_email_verified: bool = False
     points: int = 0
 

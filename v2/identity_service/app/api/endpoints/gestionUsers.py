@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import EmailStr
 from asyncpg import Connection
+from uuid import UUID
 from fastapi.encoders import jsonable_encoder
 from app.db.session import connect_to_db, close_db_connection
-from app.db.schemas.user import UserFindByBirth, UserFindByName, UserFindByEmail, UserFindById
-from app.services.user_service import get_users, get_by_username, get_user_by_email, get_user, get_users_by_birthday
+from app.db.schemas.user import UserFindByBirth, UserFindByName, UserFindByEmail, UserFindById,UserUpdate
+from app.services.user_service import get_users, get_by_username, get_user_by_email, get_user, get_users_by_birthday,update_user
 import asyncpg
 import logging
 
@@ -91,19 +92,48 @@ async def get_users_by_birth(user: UserFindByBirth, db: asyncpg.Connection = Dep
         logger.error(f"Unexpected error in get_users_by_birth: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred.")
 
-@router.get("/get_user_by_id")
-async def get_user_by_id(user: UserFindById, db: asyncpg.Connection = Depends(get_db)):
+
+@router.get("/get_user_by_id/{user_id}")
+async def get_user_by_id(user_id: UUID, db: asyncpg.Connection = Depends(get_db)):
     """
-    Récupérer un utilisateur par ID.
+    Récupérer un utilisateur par son ID passé dans l'URL.
     """
     try:
-        user_data = await get_user(db, user.id)
+        user_data = await get_user(db, user_id)
         if not user_data:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé.")
         return jsonable_encoder(user_data)
     except ValueError as e:
-        logger.error(f"ValueError in get_user_by_id: {e}")
+        logging.error(f"ValueError dans get_user_by_id : {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        logger.error(f"Unexpected error in get_user_by_id: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred.")
+        logging.error(f"Erreur inattendue dans get_user_by_id : {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Une erreur inattendue est survenue.")
+
+@router.put("/update_user_by_id/{user_id}")
+async def update_user_by_id(user_id: UUID, user: UserUpdate, db: asyncpg.Connection = Depends(get_db)):
+    """
+    Mettre à jour un utilisateur par son ID passé dans l'URL.
+    """
+    try:
+        # Vérifier si l'utilisateur existe
+        user_data = await get_user(db, user_id)
+        if not user_data:
+            logging.error(f"Utilisateur avec l'ID {user_id} non trouvé.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé.")
+        
+        # Appeler la fonction pour mettre à jour l'utilisateur
+        updated_user = await update_user(db, user_id, user)
+        
+        if not updated_user:
+            logging.error(f"Echec de la mise à jour de l'utilisateur avec l'ID {user_id}.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Échec de la mise à jour.")
+        
+        # Retourner les données de l'utilisateur mis à jour
+        return jsonable_encoder(updated_user)
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        logging.error(f"Erreur lors de la mise à jour de l'utilisateur: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erreur serveur.")
