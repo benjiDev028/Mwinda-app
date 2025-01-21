@@ -6,6 +6,7 @@ import LoginScreen from "../Screens/LoginScreen/LoginScreen";
 import { useNavigation } from '@react-navigation/native';
 import SignIn from '../Screens/SigninScreen/SigninScreen';
 import { createStackNavigator } from "@react-navigation/stack"; // Utiliser Stack pour une navigation indépendante
+import CheckEmailScreen from '../Screens/PasswordReset/checkEmailScreen/CheckEmailScreen';
 
 const Stack = createStackNavigator();
 
@@ -40,6 +41,11 @@ export default function MainNavigator() {
                   
                     <Stack.Screen name="signin" options={{
                     headerShown: false, }}  component={SignIn} />
+
+                    <Stack.Screen name="check-email" options={{
+                    headerShown: false, }}  component={CheckEmailScreen} />
+
+                   
                 </>
             )}
         </Stack.Navigator>

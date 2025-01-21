@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await AuthService.Login(email, password);
+    
   
     if (response && response.access_token) {
       const token = response.access_token;

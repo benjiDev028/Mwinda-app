@@ -25,6 +25,11 @@ export default  function LoginScreen(){
 
     const handleLogin = async () => {
      
+      if(email ==='' || password==='')
+      {
+        Alert.alert("Avertissement","veuillez remplir tous les champs")
+        return;
+      }
       try {
         const { token, userRole } = await login(email.toLowerCase(), password);
         if (userRole === 'admin') {
@@ -34,7 +39,10 @@ export default  function LoginScreen(){
         }
       } catch (error) {
         setError('Échec de la connexion. Veuillez vérifier vos identifiants.');
-        Alert.alert("identifianc", "email ou mot passe incoreccte")
+        Alert.alert("error", "email ou mot passe incoreccte")
+      
+        setPassword('')
+       
       }
     };
 
@@ -48,7 +56,7 @@ export default  function LoginScreen(){
 
             <View style={styles.container2}>
                 <View style={styles.form}>
-                {error && <Text style={styles.errortext}>{error}</Text>}
+               
                     <Text style={styles.text}>{t('email')}</Text>
          
                 <TextInput
@@ -88,7 +96,7 @@ export default  function LoginScreen(){
 
             <View>
           
-              <TouchableOpacity>
+              <TouchableOpacity onPress={()=>navigation.navigate('check-email')}>
                   <Text style={styles.forgotPassword}>{t('forgot password')} ?</Text>
               </TouchableOpacity>
             </View>

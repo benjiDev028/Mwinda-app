@@ -2,7 +2,7 @@ const url = "http://192.168.2.13:8001";
 
 
 const Register = async (firstname, lastname, email, password,date_birth) => {
-  try {
+
     const response = await fetch(url + '/identity/register', {
       method: 'POST',
       headers: {
@@ -28,10 +28,7 @@ const Register = async (firstname, lastname, email, password,date_birth) => {
       console.error("Error creating user:", errorData.detail);
       throw new Error(errorData.detail || 'Erreur lors de l\'inscription');
     }
-  } catch (error) {
-    console.error("Error during registration:", error.message);
-    return { success: false, error: error.message };
-  }
+  
 };
 
 

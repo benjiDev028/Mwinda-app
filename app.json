@@ -8,20 +8,31 @@
     "userInterfaceStyle": "light",
     "backgroundColor": "#fec107",
     "newArchEnabled": true,
+    "permissions": ["CAMERA"],
+    
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourapp.identifier",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app requires microphone access"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/splash.png",
-        "backgroundColor": "#fec107"
+        "backgroundColor": "#fec107",
+        "permissions": ["CAMERA"]
+        
       }
     },
     "web": {
       "favicon": "./assets/splash-logo.jpg"
     },
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      
+
+      "expo-barcode-scanner"
     ]
   }
 }

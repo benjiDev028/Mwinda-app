@@ -75,8 +75,11 @@ export default function AdminStack() {
       <Tab.Screen
         name="ProfileAdmin"  // Le nom est "ProfileAdmin"
         component={AdminProfileScreen}
+        
         options={{
           tabBarLabel: t('profile'),
+          
+          
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),

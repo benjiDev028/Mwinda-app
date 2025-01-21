@@ -9,15 +9,12 @@ export default function ClientCodebarScreen() {
 
   // Cette fonction sera appelée à chaque fois que la page est visitée
   useEffect(() => {
-    const fetchBarcode = async () => {
-      setLoading(true); // Démarre le chargement
-      await reloadBarcode(); // Rafraîchit le barcode
-      setLoading(false); // Fin du chargement
-    };
-
-    fetchBarcode(); // Appel de la fonction lors du montage du composant
-
-  }, []); // Le tableau vide [] signifie que cet effet ne se déclenche qu'au montage (lors de la navigation vers la page)
+    if (barcodeBase64) {
+      setLoading(false); // Fin du chargement une fois le code-barres disponible
+    } else {
+      setLoading(true); // Chargement si le code-barres est encore introuvable
+    }
+  }, [barcodeBase64]); // L'effet est déclenché à chaque changement de barcodeBase64
 
   return (
     <View style={styles.container}>
