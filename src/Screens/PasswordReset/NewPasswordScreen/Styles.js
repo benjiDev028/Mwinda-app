@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 40,
-        width: 50, // Fixer une largeur pour les inputs
+        width: 150, // Fixer une largeur pour les inputs
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 10,
@@ -52,6 +52,34 @@ const styles = StyleSheet.create({
         textAlign:'center',
         marginHorizontal: 5, // Ajouter un espacement horizontal
     },
+
+    activeButton: {
+        backgroundColor: '#fec107',
+         padding: 10, 
+         borderRadius: 20,
+          marginRight: 60 ,
+          width:'90%',
+          alignItems: 'center', 
+          marginLeft:53,
+          marginTop:50,
+    
+       
+        
+  
+        
+        },loaderContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+        },
+        loaderText: {
+            marginTop: 10,
+            color: "#ffffff",
+            fontSize: 16,
+        },
+    
+    
 });
 
 export default styles;

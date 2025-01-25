@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import SignIn from '../Screens/SigninScreen/SigninScreen';
 import { createStackNavigator } from "@react-navigation/stack"; // Utiliser Stack pour une navigation indépendante
 import CheckEmailScreen from '../Screens/PasswordReset/checkEmailScreen/CheckEmailScreen';
+import VerificationScreen from '../Screens/PasswordReset/VerificationScreen/VerificationScreen';
+import NewPasswordScreen from '../Screens/PasswordReset/NewPasswordScreen/NewPasswordScreen';
 
 const Stack = createStackNavigator();
 
@@ -44,6 +46,13 @@ export default function MainNavigator() {
 
                     <Stack.Screen name="check-email" options={{
                     headerShown: false, }}  component={CheckEmailScreen} />
+
+                    <Stack.Screen name="verification" options={{
+                    headerShown: false, }}  component={VerificationScreen} />
+
+                    <Stack.Screen name="newpassword-screen" options={{
+                    headerShown: false, }}  component={NewPasswordScreen} />
+
 
                    
                 </>
