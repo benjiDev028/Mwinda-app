@@ -7,7 +7,6 @@ class ResetPasswordRequest(BaseModel):
     email: str  # L'email de l'utilisateur qui souhaite réinitialiser son mot de passe
 
 class CodeResetPasswordRequest(BaseModel):
-    email: str  # L'email de l'utilisateur qui souhaite réinitialiser son mot de passe
     code : str 
 
 class UpdatePasswordRequest(BaseModel):
