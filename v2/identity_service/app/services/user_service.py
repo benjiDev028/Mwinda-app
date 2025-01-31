@@ -38,9 +38,9 @@ async def register_user(db: asyncpg.Connection, user: UserCreate) -> UserRespons
         hashed_password, salt_password = get_password_hash(user.password)
         
         query = """
-        INSERT INTO users (id, first_name, last_name, email, password_hash, password_salt, date_birth, is_email_verified, points)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
+        INSERT INTO users (id, first_name, last_name, email, password_hash, password_salt, date_birth, is_email_verified)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, pointstudios, pointevents, role
         """
         new_user = await db.fetchrow(
             query,
@@ -51,8 +51,7 @@ async def register_user(db: asyncpg.Connection, user: UserCreate) -> UserRespons
             hashed_password,
             salt_password,
             user.date_birth,
-            False,
-            0
+            False
         )
         
         if not new_user:
@@ -87,7 +86,7 @@ async def update_user(db: asyncpg.Connection, user_id: uuid, user: UserUpdate) -
         UPDATE users
         SET first_name = $1, last_name = $2, email = $3, date_birth = $4
         WHERE id = $5
-        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, points, role
+        RETURNING id, first_name, last_name, email, date_birth, is_email_verified, pointevents,pointstudios, role
         """
         
         # Exécution de la requête
@@ -124,7 +123,7 @@ async def activate_user_email(db: asyncpg.Connection, email: str):
 
 async def get_user(db: asyncpg.Connection, user_id: uuid):
     try:
-        query = "SELECT id, first_name, last_name, email, date_birth, role, is_email_verified, points FROM users WHERE id = $1"
+        query = "SELECT id, first_name, last_name, email, date_birth, role, is_email_verified, pointevents,pointstudios FROM users WHERE id = $1"
         user = await db.fetchrow(query, user_id)
         if not user:
             logging.warning("Utilisateur non trouvé avec l'ID : %s", user_id)
@@ -145,7 +144,7 @@ async def get_userv1_by_email(db: asyncpg.Connection, email: str):
 
 async def get_user_by_email(db: asyncpg.Connection, email: str):
     try:
-        query = "SELECT id, first_name, last_name, email, date_birth, is_email_verified, points FROM users WHERE email = $1"
+        query = "SELECT id, first_name, last_name, email, date_birth, is_email_verified,barcode, pointevents,pointstudios FROM users WHERE email = $1"
         user = await db.fetchrow(query, email)
         if not user:
             logging.warning("User not found with email: %s", email)
@@ -157,7 +156,7 @@ async def get_user_by_email(db: asyncpg.Connection, email: str):
 async def get_users_by_birthday(db: asyncpg.Connection, date_birth: str) -> List[UserResponse]:
     try:
         query = """
-        SELECT id, first_name, last_name, email, date_birth, is_email_verified, points
+        SELECT id, first_name, last_name, email, date_birth, is_email_verified, pointevents,pointstudios
         FROM users
         WHERE date_birth = $1
         """
@@ -178,10 +177,10 @@ async def get_users_by_birthday(db: asyncpg.Connection, date_birth: str) -> List
         logging.error("Error fetching users by birthday: %s", str(e))
         raise RuntimeError(f"Error fetching users: {e}")
 
-async def get_users(db: asyncpg.Connection) -> List[UserResponse]:
+async def get_users(db: asyncpg.Connection) -> List:
     try:
         query = """
-        SELECT id, first_name, last_name, email, date_birth, is_email_verified,role, points
+        SELECT id, first_name, last_name, email, date_birth, is_email_verified,role, pointevents,pointstudios,barcode
         FROM users
         """
         users = await db.fetch(query)
@@ -193,7 +192,8 @@ async def get_users(db: asyncpg.Connection) -> List[UserResponse]:
         return [
             UserResponseFind(**{
                 **dict(user),
-                "is_email_verified": user.get("is_email_verified", False)
+                "is_email_verified": user.get("is_email_verified", False),
+                "code barre":user.get("barcode")
             })
             for user in users
         ]
@@ -204,7 +204,7 @@ async def get_users(db: asyncpg.Connection) -> List[UserResponse]:
 async def get_by_username(db: asyncpg.Connection, first_name: str, last_name: str) -> List[UserResponse]:
     try:
         query = """
-        SELECT id, first_name, last_name, email, date_birth, is_email_verified, points
+        SELECT id, first_name, last_name, email, date_birth, is_email_verified, pointevents,pointstudios
         FROM users
         WHERE first_name ILIKE '%' || $1 || '%' OR last_name ILIKE '%' || $2 || '%'
         """
@@ -232,7 +232,7 @@ async def update_user_password(db: asyncpg.Connection, user_id: str, new_passwor
         SET password_hash = $1,
             password_salt = $2
         WHERE id = $3
-        RETURNING id, points
+        RETURNING id, pointevents,pointstudios
         """
         user = await db.fetchrow(query, new_password, salt, user_id)
         
@@ -242,7 +242,8 @@ async def update_user_password(db: asyncpg.Connection, user_id: str, new_passwor
         
         user_response = {
             'id': str(user['id']),
-            'points': user['points']
+            'pointevents': user['pointevents'],
+            'pointstudios': user['pointstudios']
         }
         logging.info("Password updated successfully for user ID: %s", user_id)
         return user_response
@@ -266,14 +267,9 @@ async def reset_password_request(db: asyncpg.Connection, user: UpdatePasswordReq
         logging.error("Unexpected error during password reset request: %s", str(e))
         raise RuntimeError(f"Error during password reset request: {e}")
 
-async def generate_barcode(
-    id_user: int,
-    date_birth: datetime,
-    first_name: str,
-    last_name: str
-):
+async def generate_barcode(user):
     try:
-        reference_number = f"{id_user}-{date_birth}-{first_name}-{last_name}"
+        reference_number = f"{user['barcode']}"
         
         buffer = BytesIO()
         writer = ImageWriter()

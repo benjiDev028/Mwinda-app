@@ -45,7 +45,8 @@ class UserResponseFind(UserBase):
     email: EmailStr
     date_birth: str
     is_email_verified: bool 
-    points: int 
+    pointevents: int 
+    pointstudios: int 
     
 
 class UserCreate(UserBase):
@@ -61,14 +62,16 @@ class UserResponse(UserBase):
     date_birth: str
     role : str
     is_email_verified: bool = False
-    points: int = 0
+    pointevents: int 
+    pointstudios: int 
 
 
 
 class User(UserBase):
     id: UUID
     is_email_verified: bool = False
-    points: int = 0
+    pointevents: int 
+    pointstudios: int 
 
     class Config:
         from_attributes = True  # Utilisé pour remplacer 'orm_mode' dans Pydantic v2

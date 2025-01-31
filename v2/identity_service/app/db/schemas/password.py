@@ -8,6 +8,7 @@ class ResetPasswordRequest(BaseModel):
 
 class CodeResetPasswordRequest(BaseModel):
     code : str 
+    email : str
 
 class UpdatePasswordRequest(BaseModel):
     email: str  # Le token de réinitialisation envoyé par email

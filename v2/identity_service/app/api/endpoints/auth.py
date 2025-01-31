@@ -56,9 +56,7 @@ async def login_endpoint(user: UserLogin, db: asyncpg.Connection = Depends(get_d
             )
         
         user = await get_user_by_email(db, email)
-        reference_number, barcode_base64 = await generate_barcode(
-            user['last_name'], user['first_name'], user['date_birth'], user['id']
-        )
+        reference_number, barcode_base64 = await generate_barcode(user)
         
         logger.info(f"Connexion réussie pour l'utilisateur: {email}")
         return {
