@@ -1,34 +1,46 @@
 const url = "http://192.168.2.13:8001";
 
 
-const Register = async (firstname, lastname, email, password,date_birth) => {
+const Register = async (firstname, lastname, email, password, date_birth) => {
+  try {
+      const response = await fetch(url + '/identity/register', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+              "first_name": firstname,
+              "last_name": lastname,
+              "email": email,
+              "password": password,
+              "date_birth": date_birth
+          }),
+      });
 
-    const response = await fetch(url + '/identity/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        "first_name": firstname,
-        "last_name": lastname,
-        "email": email,
-        "password": password,
-        "date_birth": date_birth
-       
-      }),
-    });
+      // ✅ Vérifier le statut HTTP correctement
+      if (response.status !== 201) {
+          const errorData = await response.json();
+          console.error("❌ Erreur d'inscription:", errorData.message || "Erreur inconnue");
+          return { success: false, error: errorData.error || 'Erreur lors de l\'inscription' };
+      }
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("User created successfully:", data);
+      // ✅ Vérifier si le corps de la réponse est vide (cas 201 Created)
+      let data;
+      try {
+          data = await response.json();
+      } catch (jsonError) {
+          console.warn("⚠ Réponse sans JSON, mais succès confirmé.");
+          data = {}; // Valeur vide si pas de JSON
+      }
+
+      console.log("✅ Utilisateur créé avec succès:", data);
       return { success: true, data };
-    } else {
-      const errorData = await response.json();
-      console.error("Error creating user:", errorData.detail);
-      throw new Error(errorData.detail || 'Erreur lors de l\'inscription');
-    }
-  
+
+  } catch (error) {
+      console.error("❌ Erreur inattendue:", error);
+      return { success: false, error: "Une erreur inattendue s'est produite." };
+  }
 };
 
 

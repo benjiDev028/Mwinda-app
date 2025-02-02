@@ -1,85 +1,90 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: '100%',
-        backgroundColor: '#fff',
-    },
-    image: {
-        marginTop:40,
-        width: '100%',
-        height: '100%',
-        resizeMode: 'contain',
-    },
-    container1: {
-        justifyContent: 'center',
-        height: 150,
-        width: '100%',
-        backgroundColor: '#fec107',
-    },
-    container2: {
-        
-        height: '79%',
-        backgroundColor: '#e4e4e4',
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    containerText: {
-        marginTop:-340,
-        width: '100%',
-        alignItems: 'center', 
-        marginBottom: 20, // Ajouter un espacement entre le texte et les inputs
-    },
-    text: {
-        fontSize: 20,
-        textAlign: 'center',
-    },
-    containerInput: {
-        flexDirection: 'row', // Mettre les inputs côte à côte
-        justifyContent: 'center', // Centrer horizontalement les inputs
-        flexWrap: 'wrap', // Permettre aux inputs de passer à la ligne si nécessaire
-        gap: 10, // Ajouter un espacement entre les inputs
-    },
-    input: {
-        height: 40,
-        width: 150, // Fixer une largeur pour les inputs
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        textAlign:'center',
-        marginHorizontal: 5, // Ajouter un espacement horizontal
-    },
-
-    activeButton: {
-        backgroundColor: '#fec107',
-         padding: 10, 
-         borderRadius: 20,
-          marginRight: 60 ,
-          width:'90%',
-          alignItems: 'center', 
-          marginLeft:53,
-          marginTop:50,
-    
-       
-        
-  
-        
-        },loaderContainer: {
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-        },
-        loaderText: {
-            marginTop: 10,
-            color: "#ffffff",
-            fontSize: 16,
-        },
-    
-    
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  container1: {
+    height: 200,
+    justifyContent: 'center',
+    backgroundColor: '#fec107',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  image: {
+    width: '80%',
+    height: '60%',
+    resizeMode: 'contain',
+    alignSelf: 'center',
+  },
+  container2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  formContainer: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  input: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  activeButton: {
+    backgroundColor: '#fec107',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#fec107',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  activeText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;

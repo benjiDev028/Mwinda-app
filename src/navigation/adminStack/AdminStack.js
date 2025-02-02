@@ -55,7 +55,8 @@ export default function AdminStack() {
       name="Home"  // C'est ce nom qui doit correspondre dans initialRouteName
       component={AdminHomeScreen}
       options={{
-        tabBarLabel: t('scanner'),
+        tabBarLabel: t('home'),
+        
         tabBarIcon: ({ color, size }) => (
           <MaterialCommunityIcons name="home" color={color} size={size} />
         ),

@@ -1,113 +1,140 @@
-import { View,Text,Image, TextInput ,Button,TouchableOpacity,TouchableWithoutFeedback ,Keyboard, Alert} from "react-native";
-import  styles  from './Styles';
+import React, { useState, useContext, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Keyboard,
+  Alert,
+  Animated,
+  Platform,
+  Easing
+} from 'react-native';
+import styles from './Styles';
 import splash from '../../../assets/img/splash.png';
-
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { useContext } from 'react';
 
+export default function LoginScreen() {
+  const { t } = useTranslation();
+  const navigation = useNavigation();
+  const { login } = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  // Animations
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const slideAnim = useState(new Animated.Value(30))[0];
 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
-
-
-
-export default  function LoginScreen(){
-    const { t } = useTranslation();
-    const navigation = useNavigation();
-
-
-    const { login } = useContext(AuthContext);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-
-    const handleLogin = async () => {
-     
-      if(email ==='' || password==='')
-      {
-        Alert.alert("Avertissement","veuillez remplir tous les champs")
-        return;
+  const handleLogin = async () => {
+    if(email ==='' || password==='') {
+      Alert.alert("Avertissement","veuillez remplir tous les champs");
+      return;
+    }
+    
+    try {
+      const { token, userRole } = await login(email.toLowerCase(), password);
+      if (userRole === 'admin') {
+        navigation.navigate('AdminHome');
+      } else if (userRole === 'client') {
+        navigation.navigate('ClientHome');
       }
-      try {
-        const { token, userRole } = await login(email.toLowerCase(), password);
-        if (userRole === 'admin') {
-          navigation.navigate('AdminHome');
-        } else if (userRole === 'client') {
-          navigation.navigate('ClientHome');
-        }
-      } catch (error) {
-        setError('Échec de la connexion. Veuillez vérifier vos identifiants.');
-        Alert.alert("error", "email ou mot passe incoreccte")
-      
-        setPassword('')
-       
-      }
-    };
+    } catch (error) {
+      Alert.alert("Erreur", "Email ou mot de passe incorrect");
+      setPassword('');
+    }
+  };
 
+  return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Animated.View 
+          style={[
+            styles.container1,
+            { 
+              transform: [{ translateY: slideAnim }], 
+              opacity: fadeAnim 
+            }
+          ]}
+        >
+          <Image source={splash} style={styles.image} />
+        </Animated.View>
 
-    return(
-      
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}> 
-        
-        <View style ={styles.container }>
-            <View style={styles.container1}><Image source={splash} style={styles.image}/></View>  
+        <Animated.View 
+          style={[styles.container2, { opacity: fadeAnim }]}
+        >
+          <View style={styles.form}>
+            <Text style={styles.title}>{t('login')}</Text>
 
-            <View style={styles.container2}>
-                <View style={styles.form}>
-               
-                    <Text style={styles.text}>{t('email')}</Text>
-         
-                <TextInput
-                
-                style={styles.input}
-                placeholder="Email@gmail.com"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-                autoCapitalize="none" 
-                value={email}
-                onChangeText={setEmail}
-                required
-                
-            />
-            <Text style={styles.text}>{t('password')}</Text>
-           
+            <Text style={styles.label}>{t('email')}</Text>
             <TextInput
-                style={styles.input}
-                 textContentType="password"
-                placeholder="Mot de passe"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                required
+              style={styles.input}
+              placeholder="Email@gmail.com"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
             />
-            <View style={styles.containerBtn}>
 
-              <TouchableOpacity style={styles.activeButton} onPress={handleLogin}>
-                  <Text style={styles.activeText}>{t('login')}</Text>
+            <Text style={styles.label}>{t('password')}</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Mot de passe"
+              placeholderTextColor="#999"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={styles.activeButton} 
+                onPress={handleLogin}
+                activeOpacity={0.9}
+              >
+                <Text style={styles.activeText}>{t('login')}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={()=>navigation.navigate('signin')}>
-                  <Text  style={styles.inactiveText}>{t('signin')}</Text>
-              </TouchableOpacity>
-            
-            </View> 
-
-            <View>
-          
-              <TouchableOpacity onPress={()=>navigation.navigate('check-email')}>
-                  <Text style={styles.forgotPassword}>{t('forgot password')} ?</Text>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('signin')}
+                activeOpacity={0.6}
+              >
+                <Text style={styles.secondaryText}>{t('signin')}</Text>
               </TouchableOpacity>
             </View>
-          
-                
-            
-        </View>
-            </View>
-            <View style={styles.container3}></View>
 
-        </View>
-      </TouchableWithoutFeedback>
-    )
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('check-email')}
+              activeOpacity={0.6}
+            >
+              <Text style={styles.linkText}>{t('forgot password')} ?</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </View>
+    </TouchableWithoutFeedback>
+     </KeyboardAvoidingView>
+  );
 }

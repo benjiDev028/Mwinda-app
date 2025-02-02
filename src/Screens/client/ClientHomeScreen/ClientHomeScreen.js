@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,15 @@ import {
   Modal,
   Pressable,
   Animated,
+  Easing,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
 
 const stories = [
   { id: '1', url: 'https://picsum.photos/300/300?random=1', user: 'Alice', likes: 0 },
@@ -35,29 +40,24 @@ export default function ClientHomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
   const [progress, setProgress] = useState(new Animated.Value(0));
+  const navigation = useNavigation();
 
   // Animation pour les services
-  const [fadeAnim] = useState(new Animated.Value(0));  // Initialisation à 0 (invisible)
+  const scrollX = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    // Animation fade-in lorsque la page est chargée
-    Animated.timing(fadeAnim, {
-      toValue: 1, // 1 pour rendre visible
-      duration: 1000, // Durée de l'animation
-      useNativeDriver: true,
-    }).start();
-  }, []);
+  // Animation pour les stories
+  const lightPosition = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (selectedStory) {
       progress.setValue(0);
-      Animated.timing(progress, { toValue: 1, duration: 3000, useNativeDriver: false }).start();
+      Animated.timing(progress, { toValue: 1, duration: 5000, useNativeDriver: false }).start();
 
       const timer = setTimeout(() => {
         const nextIndex = (storyIndex + 1) % stories.length;
         setStoryIndex(nextIndex);
         setSelectedStory(stories[nextIndex]);
-      }, 3000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
@@ -82,8 +82,32 @@ export default function ClientHomeScreen() {
     setStoryData(updatedStories);
   };
 
+  // Animation de la lumière pour les stories
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(lightPosition, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(lightPosition, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const navigateToService = (service) => {
+    navigation.navigate('ServiceDetail', { service });
+  };
+
   return (
     <ScrollView style={styles.container}>
+      {/* Section des stories */}
       <Text style={styles.header}>Stories</Text>
       <View style={styles.storiesSection}>
         <FlatList
@@ -99,6 +123,21 @@ export default function ClientHomeScreen() {
                   style={styles.storyGradient}
                 >
                   <Image source={{ uri: item.url }} style={styles.storyImage} />
+                  <Animated.View
+                    style={[
+                      styles.lightEffect,
+                      {
+                        transform: [
+                          {
+                            translateX: lightPosition.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [-100, 200],
+                            }),
+                          },
+                        ],
+                      },
+                    ]}
+                  />
                 </LinearGradient>
                 <Text style={styles.storyUser}>{item.user}</Text>
               </TouchableOpacity>
@@ -113,21 +152,31 @@ export default function ClientHomeScreen() {
         />
       </View>
 
-      {/* Section des services avec animation fade */}
-      <View style={styles.servicesSection}>
-        <Text style={styles.sectionHeader}>Nos Services</Text>
-        <Animated.FlatList
-          data={services}
-          showsVerticalScrollIndicator={false} // Désactive la barre de défilement vertical
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Animated.View style={[styles.serviceCard, { opacity: fadeAnim }]}>
-              <Image source={{ uri: item.imageUrl }} style={styles.serviceImage} />
-              <Text style={styles.serviceName}>{item.name}</Text>
-            </Animated.View>
-          )}
-        />
-      </View>
+      {/* Section des services avec effet de parallaxe */}
+      <Text style={styles.sectionHeader}>Nos Services</Text>
+      <Animated.FlatList
+        horizontal
+        data={services}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: true })}
+        renderItem={({ item, index }) => {
+          const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+          const scale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.8, 1, 0.8],
+            extrapolate: 'clamp',
+          });
+          return (
+            <TouchableOpacity onPress={() => navigateToService(item)}>
+              <Animated.View style={[styles.serviceCard, { transform: [{ scale }] }]}>
+                <Image source={{ uri: item.imageUrl }} style={styles.serviceImage} />
+                <Text style={styles.serviceName}>{item.name}</Text>
+              </Animated.View>
+            </TouchableOpacity>
+          );
+        }}
+      />
 
       {/* Modal pour afficher une story */}
       <Modal visible={modalVisible} animationType="fade" transparent={false} onRequestClose={closeModal}>
@@ -136,7 +185,7 @@ export default function ClientHomeScreen() {
             {selectedStory && (
               <>
                 <Pressable style={styles.closeButton} onPress={closeModal}>
-                  <Text style={styles.closeButtonText}>×</Text>
+                  <Feather name="x" size={30} color="#fff" />
                 </Pressable>
 
                 <View style={styles.progressContainer}>
@@ -171,35 +220,36 @@ const styles = StyleSheet.create({
   // Section des stories
   storiesSection: { marginBottom: 20 },
   storyContainer: { marginRight: 15, alignItems: 'center' },
-  storyGradient: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 5 },
+  storyGradient: { width: 100, height: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center', marginBottom: 5, overflow: 'hidden' },
   storyImage: { width: 90, height: 90, borderRadius: 45 },
   storyUser: { textAlign: 'center', marginTop: 5, fontSize: 12 },
   likeContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 5 },
   likeIcon: { marginRight: 5 },
   likeCount: { fontSize: 14, fontWeight: 'bold' },
-
-  // Section des services
-  servicesSection: { marginBottom: 30 },
-  sectionHeader: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  serviceCard: { position: 'relative', marginRight: 15, width: '198%', height: 150, borderRadius: 10, overflow: 'hidden',padding:4 },
-  serviceImage: {
-    width: '100%',
-    height: '100%',
+  lightEffect: {
     position: 'absolute',
     top: 0,
     left: 0,
-    opacity: 0.7, // Opacité floutée
+    width: 50,
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    transform: [{ skewX: '-20deg' }],
   },
+
+  // Section des services
+  sectionHeader: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  serviceCard: { width: width * 0.8, height: 200, borderRadius: 20, overflow: 'hidden', marginRight: 15 },
+  serviceImage: { width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, opacity: 0.7 },
   serviceName: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 20,
     left: '50%',
     transform: [{ translateX: '-50%' }],
     color: '#fff',
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     textShadowColor: '#000',
-    textShadowOffset: { width: 0, height: 1 },
+    textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 10,
   },
 
@@ -208,8 +258,7 @@ const styles = StyleSheet.create({
   modalContent: { width: '100%', height: '90%', backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center' },
   modalImage: { width: '100%', height: '100%', resizeMode: 'contain' },
   modalUser: { position: 'absolute', bottom: 20, left: 20, color: 'white', fontSize: 24, fontWeight: 'bold' },
-  closeButton: { position: 'absolute', top: 30, right: 2, padding: 10, borderRadius: 50 },
-  closeButtonText: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  closeButton: { position: 'absolute', top: 30, right: 20, padding: 10, borderRadius: 50 },
   progressContainer: { width: '100%', height: 5, backgroundColor: '#e0e0e0', borderRadius: 5, position: 'absolute', top: 20 },
   progressBar: { height: 5, backgroundColor: '#007bff', borderRadius: 5 },
 });

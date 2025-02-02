@@ -5,82 +5,102 @@ import { StyleSheet } from 'react-native';
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: '#e4e4e4',
+    backgroundColor: '#F9F9F9',
   },
   container1: {
     alignItems: 'center',
-    paddingVertical: 20, // Ajoute un espace autour du logo
-    backgroundColor: '#fec107', // Couleur de fond du logo
-    
+    paddingVertical: 25,
+    backgroundColor: '#fec107',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  activeButton: {backgroundColor: '#fec107',
-    padding: 10,
-    borderRadius: 20,
-    marginRight: 60 ,
-    width:'100%',
-    alignItems: 'center', 
-    marginBottom: 30,
-    
-    
-
-
-  },
-  already: {textAlign: 'center', color: 'black', marginTop: 10 },
-
-
   image: {
-    width: 170, // Largeur du logo
-    height: 80, // Hauteur du logo
-    marginTop: 30, // Marge en haut du logo
-    padding: -10, // Espace autour du logo
-    
-    
+    width: 180,
+    height: 85,
+    resizeMode: 'contain',
+    marginTop: 20,
   },
-  
   container2: {
-    flexGrow: 1, // Permet à ScrollView d'être défilable
-    paddingHorizontal: 20, // Marges sur les côtés
-    paddingBottom: 50, // Ajoute un espace en bas
+    flexGrow: 1,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 50,
   },
   form: {
-    marginTop: 20, // Espace entre le logo et le formulaire
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 25,
+    paddingVertical: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 3,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#333',
     textAlign: 'center',
+    marginBottom: 30,
+    letterSpacing: 0.5,
   },
-  text: {
-    fontSize: 16,
-    marginBottom: 10,
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+    marginBottom: 8,
+    marginLeft: 5,
   },
   input: {
+    backgroundColor: '#F7F7F7',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
+    borderColor: '#EEE',
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 20,
+    fontSize: 15,
+    color: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  pickerContainer: {
-    
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 100,
-
+  activeButton: {
+    backgroundColor: '#fec107',
+    padding: 16,
+    borderRadius: 14,
+    marginVertical: 20,
+    shadowColor: '#fec107',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
-  selectedCountry: {
+  activeText: {
+    color: '#333',
+    fontWeight: '700',
     fontSize: 16,
     textAlign: 'center',
-    marginTop: 50,
+    letterSpacing: 0.5,
+  },
+  already: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 15,
+    fontSize: 14,
+  },
+  connexion: {
+    color: '#fec107',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
 };
-
-
-
 
 export default styles;
