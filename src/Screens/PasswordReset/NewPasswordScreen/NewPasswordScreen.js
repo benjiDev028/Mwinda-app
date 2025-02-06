@@ -13,6 +13,8 @@ import {
   Platform,
 } from "react-native";
 import splash from '../../../../assets/splash.png';
+import { Snackbar, Provider as PaperProvider } from 'react-native-paper'; // Importer Snackbar
+
 import ResetPasswordService from "../../../Services/PasswordServices/ResetPasswordService";
 import styles from './Styles';
 import { validatePassword } from "../../../Configurations/Validators";
@@ -26,6 +28,10 @@ export default function NewPasswordScreen() {
   const fadeAnim = useState(new Animated.Value(0))[0]; // Animation pour le formulaire
   const buttonScale = useState(new Animated.Value(1))[0]; // Animation pour le bouton
 
+  const [snackbarVisible, setSnackbarVisible] = useState(false); // État pour gérer la visibilité du Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Message du Snackbar
+  const [snackbarType, setSnackbarType] = useState("default"); 
+
   // Animation d'apparition du formulaire
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -36,9 +42,18 @@ export default function NewPasswordScreen() {
     }).start();
   }, []);
 
+    // Afficher un Snackbar
+    const showSnackbar = (message, type = "default") => {
+        setSnackbarMessage(message);
+        setSnackbarType(type);
+        setSnackbarVisible(true);
+      };
+    
+
   const handleValidate = async () => {
     if (!validatePassword(password)) {
       Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères, une lettre, un chiffre et un caractère spécial.');
+      showSnackbar("Le mot de passe doit contenir au moins 6 caractères, une lettre, un chiffre et un caractère spécial.", "warning");
       return;
     }
 
@@ -62,23 +77,29 @@ export default function NewPasswordScreen() {
     try {
       const response = await ResetPasswordService.NewPassword(resetEmail.toLowerCase(), password);
       if (response) {
-        Alert.alert("Succès", "Mot de passe mis à jour !", [
-          { text: "OK", onPress: () => navigation.navigate('Login') }
-        ]);
+        // Alert.alert("Succès", "Mot de passe mis à jour !", [
+        //   { text: "OK", onPress: () => navigation.navigate('Login') }
+        // ]);
+        showSnackbar("Mot de passe mis à jour !", "success");
+        navigation.navigate('Login');
+
         await AsyncStorage.removeItem("reset");
       } else {
-        Alert.alert("Erreur", "Erreur lors de la mise à jour du mot de passe.");
+        // Alert.alert("Erreur", "Erreur lors de la mise à jour du mot de passe.");
+        showSnackbar("Erreur lors de la mise à jour du mot de passe.", "error");
       }
     } catch (error) {
       console.error("Erreur", error);
-      Alert.alert("Erreur", "Erreur lors de la mise à jour du mot de passe.");
+    //   Alert.alert("Erreur", "Erreur lors de la mise à jour du mot de passe.");
+        showSnackbar("Erreur lors de la mise à jour du mot de passe.", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
+    <PaperProvider>
+ <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
@@ -116,5 +137,24 @@ export default function NewPasswordScreen() {
         </View>
       </Animated.View>
     </KeyboardAvoidingView>
+    <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          duration={3000} // Durée d'affichage du Snackbar
+          style={{
+            backgroundColor:
+              snackbarType === "success"
+                ? "#4CAF50" // Vert pour le succès
+                : snackbarType === "error"
+                ? "#F44336" // Rouge pour les erreurs
+                : snackbarType === "warning"
+                ? "#FFC107" // Jaune pour les avertissements
+                : "#333", // Couleur par défaut
+          }}
+        >
+            {snackbarMessage}
+            </Snackbar>
+    </PaperProvider>
+   
   );
 }

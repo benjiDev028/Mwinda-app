@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
+  ActivityIndicator,
   Easing
 } from 'react-native';
 import splash from '../../../assets/img/splash.png';
@@ -35,6 +36,7 @@ export default function SignIn() {
   const [Email, setEmail] = useState('');
   const [Password, setPassword] = useState('');
   const [date_birth, setDate_birth] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
   // Animations
@@ -57,7 +59,7 @@ export default function SignIn() {
     ]).start();
   }, []);
 
-  const handleLogin = async () => {
+ const handleLogin = async () => {
     if (Firstname === '' || Lastname === '' || Email === '' || Password === '' || date_birth === '') {
       Alert.alert('Erreur', 'Tous les champs sont obligatoires.');
       return;
@@ -73,6 +75,7 @@ export default function SignIn() {
       return;
     }
 
+    setIsLoading(true);
     try {
       const response = await UserService.Register(Firstname, Lastname, Email.toLowerCase(), Password, date_birth);
 
@@ -89,6 +92,8 @@ export default function SignIn() {
     } catch (error) {
       console.error("Error during registration:", error);
       Alert.alert('Erreur', "Une erreur est survenue. Veuillez vérifier votre connexion ou réessayer plus tard.");
+    }finally{
+      setIsLoading(false);
     }
 };
 
@@ -165,8 +170,12 @@ export default function SignIn() {
                 style={styles.activeButton} 
                 onPress={handleLogin}
                 activeOpacity={0.9}
+                desabled={isLoading}
               >
-                <Text style={styles.activeText}>Create Account</Text>
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ):( <Text style={styles.activeText}>Create Account</Text>)}
+                
               </TouchableOpacity>
 
               <TouchableOpacity 

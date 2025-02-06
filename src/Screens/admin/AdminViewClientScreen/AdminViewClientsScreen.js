@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  StyleSheet, 
-  TextInput, 
+import { View, Text, FlatList, TouchableOpacity, TextInput, 
   Modal, 
   ActivityIndicator,
   Animated,
-  Easing
+  Easing,RefreshControl
 } from 'react-native';
+import {styles} from './Styles';
 import { Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserService from '../../../Services/UserServices/UserService';
+import { useNavigation } from '@react-navigation/native';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -28,6 +24,9 @@ export default function AdminViewClientsScreen() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [filter, setFilter] = useState('all'); // Filter state (all, admin, client, favorites)
+  const [refreshing, setRefreshing] = useState(false);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -47,6 +46,15 @@ export default function AdminViewClientsScreen() {
     };
     fetchUsers();
   }, []);
+
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    const data = await UserService.GetUsers();
+    setUsers(data);
+    setFilteredUsers(data);
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     filterUsers();
@@ -96,8 +104,12 @@ export default function AdminViewClientsScreen() {
   const handleAction = (userId, action) => {
     switch (action) {
       case 'view':
-        alert('Voir les détails de l\'utilisateur');
-        break;
+
+      alert('Voir l\'utilisateur'+ userId);
+      const id = userId;
+      navigation.navigate('UserDetails',{ id}); // Naviguer vers UserDetails
+      console.log('id apres clique : ' + userId);
+      break;
       case 'edit':
         alert('Éditer l\'utilisateur');
         break;
@@ -112,7 +124,7 @@ export default function AdminViewClientsScreen() {
 
   const confirmDelete = async () => {
     if (userToDelete !== null) {
-      // Effectuer la suppression (tu peux appeler UserService.DeleteUser si tu as une fonction pour ça)
+      // Effectuer la suppression (tu peux appeler UserService.DeleteUser 
       console.log(`Utilisateur avec ID ${userToDelete} supprimé.`);
       
       // Fermer le modal après la suppression
@@ -267,6 +279,14 @@ export default function AdminViewClientsScreen() {
               <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>
             </View>
           }
+          refreshControl={
+            <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#2196F3']}
+            tintColors={['#FEC107']}
+            />
+          }
         />
       )}
 
@@ -275,130 +295,5 @@ export default function AdminViewClientsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-    padding: 20
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#2C3E50',
-    marginBottom: 25,
-    textAlign: 'center'
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 5,
-    elevation: 2
-  },
-  filterButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center'
-  },
-  activeFilter: {
-    backgroundColor: '#2196F3'
-  },
-  filterText: {
-    color: '#666',
-    fontWeight: '500'
-  },
-  activeFilterText: {
-    color: '#fff'
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    elevation: 2
-  },
-  searchIcon: {
-    marginRight: 10
-  },
-  searchInput: {
-    flex: 1,
-    height: 50,
-    color: '#333',
-    fontSize: 16
-  },
-  userItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4
-  },
-  favoriteItem: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#FFD700'
-  },
-  userInfo: {
-    flex: 1
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 5
-  },
-  userEmail: {
-    fontSize: 14,
-    color: '#666'
-  },
-  favoriteIcon: {
-    marginLeft: 15
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: '80%',
-    marginVertical: 10
-  },
-  actionButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 60,
-    height: '100%',
-    marginHorizontal: 5,
-    borderRadius: 8,
-    backgroundColor: '#2196F3'
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  loadingText: {
-    marginTop: 15,
-    color: '#666'
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 50
-  },
-  emptyText: {
-    marginTop: 15,
-    color: '#888',
-    fontSize: 16
-  },
-  // Styles du modal restent inchangés
-});
+
 

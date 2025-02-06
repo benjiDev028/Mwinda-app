@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { AuthContext } from "../context/AuthContext";
-import AdminStack from "./adminStack/AdminStack";
-import ClientStack from "./clientStack/ClientStack";
+import AdminStack from "./admin/AdminTabs";
+import ClientTabs from "./client/ClientTabs";
 import LoginScreen from "../Screens/LoginScreen/LoginScreen";
 import { useNavigation } from '@react-navigation/native';
 import SignIn from '../Screens/SigninScreen/SigninScreen';
@@ -9,6 +9,8 @@ import { createStackNavigator } from "@react-navigation/stack"; // Utiliser Stac
 import CheckEmailScreen from '../Screens/PasswordReset/checkEmailScreen/CheckEmailScreen';
 import VerificationScreen from '../Screens/PasswordReset/VerificationScreen/VerificationScreen';
 import NewPasswordScreen from '../Screens/PasswordReset/NewPasswordScreen/NewPasswordScreen';
+import UserDetailsScreen from '../Screens/admin/AdminCrudUsersDetails/UserDetailsScreen/UserDetailsScreen';
+import EditUserScreen from '../Screens/admin/AdminCrudUsersDetails/EditUserScreen/EditUserScreen';
 
 const Stack = createStackNavigator();
 
@@ -27,14 +29,21 @@ export default function MainNavigator() {
 
     return (
         <Stack.Navigator>
-            {/* Si l'utilisateur est un admin, afficher la stack admin */}
-            {userRole === 'admin' ? (
-                <Stack.Screen name="Admin" options={{
-                    headerShown: false, }} component={AdminStack} />
+      {userRole === 'admin' ? (
+        <Stack.Screen 
+          name="AdminRoot" 
+          component={AdminStack} // Utilisez le Stack Admin complet
+          options={{ headerShown: false }}
+        />
+
+                    
             ) : userRole === 'client' ? (
                 <Stack.Screen name="Client"  options={{
-                    headerShown: false, }} component={ClientStack} />
-            ) : (
+                    headerShown: false, }} component={ClientTabs} />
+            ) : 
+            
+            (
+                
                 <>
                     
                     <Stack.Screen name="Login"  options={{
@@ -53,8 +62,16 @@ export default function MainNavigator() {
                     <Stack.Screen name="newpassword-screen" options={{
                     headerShown: false, }}  component={NewPasswordScreen} />
 
+            
 
-                   
+                    <Stack.Screen name="EditUser" options={{
+                    headerShown: false, }}  component={EditUserScreen} /> 
+
+                    
+                    
+                    
+
+                  
                 </>
             )}
         </Stack.Navigator>

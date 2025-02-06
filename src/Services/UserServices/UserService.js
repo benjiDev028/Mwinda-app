@@ -81,6 +81,9 @@ const GetUsers = async ()=>{
         });
         if (response.ok) {
           const data = await response.json();
+        
+         
+          
           return data;
           } else {
             const error = await response.json();
@@ -92,6 +95,57 @@ const GetUsers = async ()=>{
   }
 }
 
+const GetStats = async ()=>{
+  try{
+    const response = await fetch(`${url}/identity/get_all_users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const totalUsers = data.length;
+          const usersInactives = data.filter(user => user.is_email_verified === false).length;
+          const userGetBonusStudio = data.filter(user => user.pointstudios >= 5000).length;
 
-export default {Register,updateUser,GetUsers};
+          console.log('Users inactiv:', usersInactives);
+          console.log('Total users:', totalUsers);
+          console.log('Users get bonus studio:', userGetBonusStudio);
+          
+          
+          return {data,totalUsers,usersInactives,userGetBonusStudio};
+          } else {
+            const error = await response.json();
+            console.log('Error fetching users:', error);
+            }
+    } catch (error) {
+              console.log('Error fetching users:', error);
+
+  }
+}
+
+
+const GetUserById =  async (id) => {
+  try {
+    const response = await fetch(`${url}/identity/get_user_by_id/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const error = await response.json();
+      console.log('Error fetching user:', error);
+    }
+  } catch (error) {
+    console.log('Error fetching user:', error);
+  }
+}
+
+export default {Register,updateUser,GetUsers,GetStats,GetUserById};
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 
@@ -9,10 +10,30 @@ import AdminHistoryScreen from "../../Screens/admin/AdminHistoryScreen/AdminHist
 import AdminScanBarcodeScreen from "../../Screens/admin/AdminScanCodeBarScreen/AdminScanBarcodeScreen";
 import AdminViewClientsScreen from "../../Screens/admin/AdminViewClientScreen/AdminViewClientsScreen";
 import AdminHomeScreen from '../../Screens/admin/AdminHomeScreen/AdminHomeScreen';
+import UserDetailsScreen from '../../Screens/admin/AdminCrudUsersDetails/UserDetailsScreen/UserDetailsScreen';
+import EditUserScreen from '../../Screens/admin/AdminCrudUsersDetails/EditUserScreen/EditUserScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+const ViewClientsStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false, // Masquer le header par défaut
+        presentation: 'modal', // Pour l'effet de superposition
+        cardStyle: { backgroundColor: 'transparent' }, // Fond transparent pour l'overlay
+      }}
+    >
+      {/* Écran principal de ViewClients */}
+      <Stack.Screen name="ViewClientsMain" component={AdminViewClientsScreen} />
 
-export default function AdminStack() {
+      {/* Écrans de superposition */}
+      <Stack.Screen name="UserDetails" component={UserDetailsScreen} />
+      <Stack.Screen name="EditUser" component={EditUserScreen} />
+    </Stack.Navigator>
+  );
+};
+export default function AdminTabs() {
   const { t } = useTranslation();
 
   return (
@@ -63,16 +84,16 @@ export default function AdminStack() {
       }}
     />
       
-       <Tab.Screen
-        name="ViewClients"  // Le nom doit être "ViewClients" ici
-        component={AdminViewClientsScreen}
-        options={{
-          tabBarLabel: t('costumers'),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-group" color={color} size={size} />
-          ),
-        }}
-      />
+      <Tab.Screen
+    name="ViewClients"
+    component={ViewClientsStack} // Utilisez le Stack Navigator ici
+    options={{
+      tabBarLabel: t('costumers'),
+      tabBarIcon: ({ color, size }) => (
+        <MaterialCommunityIcons name="account-group" color={color} size={size} />
+      ),
+    }}
+  />
       <Tab.Screen
         name="ProfileAdmin"  // Le nom est "ProfileAdmin"
         component={AdminProfileScreen}

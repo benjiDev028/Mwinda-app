@@ -7,7 +7,8 @@ import {
   TouchableOpacity, 
   Alert, 
   Animated, 
-  Easing 
+  Easing ,
+  ActivityIndicator
 } from "react-native";
 import splash from '../../../../assets/splash.png';
 import ResetPasswordService from "../../../Services/PasswordServices/ResetPasswordService";
@@ -17,6 +18,7 @@ import styles from './Styles';
 
 export default function VerificationScreen() {
     const [Code, setCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
     
     // Animations
@@ -46,7 +48,16 @@ export default function VerificationScreen() {
         ]).start();
     }, []);
 
+
     const handleValidate = async () => {
+
+        if (Code === '') {
+            Alert.alert("Avertissement !", "Veuillez entrer le code de vérification.");
+            return;
+        }
+
+        setIsLoading(true);
+
         const resetEmail = await AsyncStorage.getItem("reset");
         try {
             const response = await ResetPasswordService.CheckCode(resetEmail.toLowerCase(), Code);
@@ -60,6 +71,9 @@ export default function VerificationScreen() {
         } catch (error) {
             console.error("Erreur lors de la vérification du code:", error);
             Alert.alert("Erreur", "Erreur lors de la vérification du code.");
+        }
+        finally{
+            setIsLoading(false);
         }
     }
 
@@ -93,8 +107,13 @@ export default function VerificationScreen() {
                     style={styles.validateButton}
                     onPress={handleValidate}
                     activeOpacity={0.9}
+                    disabled={isLoading}
                 >
-                    <Text style={styles.buttonText}>Vérifier le code</Text>
+                    {isLoading ?( 
+                     <ActivityIndicator size="small" color="#fff" /> 
+                    ):( 
+                    
+                    <Text style={styles.buttonText}>Vérifier le code</Text>)}
                 </TouchableOpacity>
             </Animated.View>
         </View>

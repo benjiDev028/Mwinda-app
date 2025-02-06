@@ -7,12 +7,15 @@ import { useEffect, useState } from 'react';
 import MainNavigator from './src/navigation/MainNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from "@react-navigation/stack"; // Utiliser Stack pour une navigation indépendante
+
 
 
 export default function App() {
   
   const [isShowSplash, setIsShowSplash] = useState(true);
-  const stack = createBottomTabNavigator();
+
+  const Stack = createStackNavigator();
 
   useEffect(() => {
     setTimeout(() => {

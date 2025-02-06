@@ -76,6 +76,17 @@ const styles = StyleSheet.create({
         color: '#2D3436',
         letterSpacing: 0.8,
     },
+    activeButton: {
+        backgroundColor: '#fec107',
+        padding: 15,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#fec107',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 5,}
 });
 
 export default styles;
